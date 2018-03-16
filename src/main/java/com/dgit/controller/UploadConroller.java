@@ -226,9 +226,7 @@ public class UploadConroller {
 		
 		}catch(Exception e){
 			entity = new ResponseEntity<byte[]>(HttpStatus.BAD_REQUEST);
-		}
-		
-		
+		}	
 		return entity;
 	}
 	
