@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dgit.util.MediaUtils;
+import com.dgit.util.UploadFileUtils;
 
 @Controller
 public class UploadConroller {
@@ -180,7 +181,7 @@ public class UploadConroller {
 			for(MultipartFile f : files){
 				logger.info("file : " + f.getOriginalFilename()); 
 				
-				File dir = new File(outUploadPath);
+				/*File dir = new File(outUploadPath);
 				if(!dir.exists()){
 					dir.mkdirs();
 				}
@@ -189,9 +190,15 @@ public class UploadConroller {
 				String saveName = uid.toString() + "_" + f.getOriginalFilename();
 				File imgFile = new File(outUploadPath, saveName);
 				
-				FileCopyUtils.copy(f.getBytes(), imgFile);
-				list.add(outUploadPath + "/" + saveName);
+				FileCopyUtils.copy(f.getBytes(), imgFile);*/
 				
+				// 업로드를 해주는 별도의 클래스를 작성해서 처리
+				String saveName = UploadFileUtils.uploadFile(outUploadPath, f.getOriginalFilename(), f.getBytes());
+				
+				// 반환된 saveName에는 /가 앞에 붙기 때문에 /를 붙였던 기존의 코드 주석
+				/*list.add(outUploadPath + "/" + saveName);*/ 
+								
+				list.add(outUploadPath + saveName);
 			}
 			entity = new ResponseEntity<List<String>>(list, HttpStatus.OK);
 		}catch(Exception e){
@@ -199,6 +206,65 @@ public class UploadConroller {
 		}
 		return entity;
 	}
+	
+	@RequestMapping(value="/uploadPreview", method = RequestMethod.GET)
+	public String uploadPreviewForm(){
+		return "uploadPreviewForm";
+	}
+	
+	@RequestMapping(value="/uploadPreview", method = RequestMethod.POST)
+	public String uploadPreviewFormPost(String writer, MultipartFile file, Model model){
+		logger.info("uploadPreviewFormPost()");
+		logger.info("writer : " + writer);
+		logger.info("file : " + file.getOriginalFilename());
+		
+		
+		try {
+			String saveName = UploadFileUtils.uploadFile(outUploadPath, file.getOriginalFilename(), file.getBytes());
+			model.addAttribute("writer", writer);
+			model.addAttribute("saveName", outUploadPath + saveName);
+			logger.info("file : " + saveName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+		return "uploadPreviewFormResult";
+	}
+	
+	
+	@RequestMapping(value="uploadPreviewMultiple", method = RequestMethod.GET)
+	public String uploadPreviewMultiple(){
+		return "uploadPreviewMultiple";
+	}
+	
+	@RequestMapping(value="uploadPreviewMultiple", method = RequestMethod.POST)
+	public String uploadPreviewMultiplePost(String writer, List<MultipartFile> files, Model model){
+		logger.info("uploadPreviewMultiplePost()");
+		logger.info("writer : " + writer);
+		List<String> list = new ArrayList<>();
+		
+		for(MultipartFile f : files){
+			logger.info("file : " + f.getOriginalFilename());
+			
+			try {
+				String saveName = UploadFileUtils.uploadFile(outUploadPath, f.getOriginalFilename(), f.getBytes());
+				list.add(outUploadPath + saveName);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		model.addAttribute("writer", writer);
+		model.addAttribute("list", list);		
+		
+		return "uploadPreviewMultipleReulst";
+	}
+	
 	
 	@ResponseBody
 	@RequestMapping(value="displayFile", method = RequestMethod.GET) 
@@ -236,11 +302,23 @@ public class UploadConroller {
 		ResponseEntity<String> entity = null;
 		logger.info("deleteFile()");
 		logger.info("filename : " + filename);
+		
+		String originalFile = filename.substring(0, filename.indexOf("s_")) + filename.substring(filename.indexOf("s_") + 2);
+		logger.info("originalFile : " + originalFile);
+		
+		
 		try{
+			System.gc();
 			File del = new File(filename);
 			if(del.exists()){
 				del.delete();
 			}
+			
+			File delOriginal = new File(originalFile);
+			if(delOriginal.exists()){
+				delOriginal.delete();
+			}
+			
 			entity = new ResponseEntity<String>("success", HttpStatus.OK);			
 		}catch(Exception e){
 			entity = new ResponseEntity<String>("success", HttpStatus.BAD_REQUEST);
