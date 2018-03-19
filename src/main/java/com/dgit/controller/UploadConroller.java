@@ -237,6 +237,8 @@ public class UploadConroller {
 		logger.info("deleteFile()");
 		logger.info("filename : " + filename);
 		try{
+		
+			System.gc(); // 가비지 컬렉터 호출
 			File del = new File(filename);
 			if(del.exists()){
 				del.delete();
