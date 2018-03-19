@@ -10,15 +10,15 @@
 <script>
 	$(function(){
 		$(document).on("click", "img", function(){
-			alert("D");
-			var path = $(this).next().attr("href").split("=")[1];
+			var path = $(this).next().attr("href");
+			var front = path.substr(0, path.indexOf("s_"));
+			var end =  path.substr(path.indexOf("s_") + 2)
 			
-			var originalFile = path.substr(0, path.indexOf("s_")) + path.substr(path.indexOf("s_") + 2);
 			
-			$(this).next().attr("href", "displayFile?filename=" + originalFile);
-			var $a = $(this).next();
+			var originalFile =  front + end;
+			alert(originalFile);
 			
-			$a.trigger("click");
+			$(this).parents("div").append("<img src='displayFile?filename=" + originalFile + "'>");
 		})
 	})
 
@@ -33,8 +33,7 @@
 		<c:forEach var="item" items="${list }">
 			<div>
 				파일 경로 : ${item } <br>
-				<img src="displayFile?filename=${item }">	
-				<a href="displayFile?filename=${item }">링크</a>
+				<img src="displayFile?filename=${item }">
 			</div>
 		</c:forEach>
 	
