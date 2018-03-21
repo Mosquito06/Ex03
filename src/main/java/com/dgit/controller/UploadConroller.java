@@ -295,36 +295,5 @@ public class UploadConroller {
 		}	
 		return entity;
 	}
-	
-	@ResponseBody
-	@RequestMapping(value="deleteFile", method = RequestMethod.GET)
-	public ResponseEntity<String> deleteFile(String filename){
-		ResponseEntity<String> entity = null;
-		logger.info("deleteFile()");
-		logger.info("filename : " + filename);
-		
-		String originalFile = filename.substring(0, filename.indexOf("s_")) + filename.substring(filename.indexOf("s_") + 2);
-		logger.info("originalFile : " + originalFile);
-		
-		
-		try{
-			System.gc(); // 가비지 컬렉터 호출
-			File del = new File(filename);
-			if(del.exists()){
-				del.delete();
-			}
-			
-			File delOriginal = new File(originalFile);
-			if(delOriginal.exists()){
-				delOriginal.delete();
-			}
-			
-			entity = new ResponseEntity<String>("success", HttpStatus.OK);			
-		}catch(Exception e){
-			entity = new ResponseEntity<String>("success", HttpStatus.BAD_REQUEST);
-		}
-		
-		return entity;
-	}
-	
+
 }

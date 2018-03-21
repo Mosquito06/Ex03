@@ -36,4 +36,35 @@ public class HomeController {
 		return "home";
 	}
 	
+	@RequestMapping(value="/doA", method=RequestMethod.GET)
+	public String doAGet(Model model){
+		logger.info("[doA] GET ===========================================");
+		
+		return "doA";
+	}
+	
+	@RequestMapping(value="/doB", method=RequestMethod.GET)
+	public String doBGet(Model model){
+		logger.info("[doB] GET ===========================================");
+		model.addAttribute("result", "doB의 result!");
+		
+		return "doB";
+	}
+	
+	@RequestMapping(value="/test1", method=RequestMethod.GET)
+	public String test1Get(Model model){
+		logger.info("[test1] GET ===========================================");
+		model.addAttribute("result", "확인 중");
+		
+		return "test1";
+	}
+	
+	@RequestMapping(value="/login", method=RequestMethod.GET)
+	public String loginGet(Model model){
+		logger.info("[login] GET ===========================================");
+		
+		 
+		return "login";
+	}
+	
 }
